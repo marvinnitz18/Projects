@@ -1,17 +1,10 @@
 #!/bin/python
 import time
-import git
-from git import RemoteProgress
 import os
 import csv
 import sys
 from datetime import datetime
-
-
-repo = ("https://github.com/CSSEGISandData/COVID-19")
-
-#https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports
-
+import dload
 
 
 #Default Output format
@@ -24,8 +17,7 @@ def log(text):
 #load data from repo
 try:
     log('getting data')
-    log('trying to clone')
-    git.Git().clone(repo,'-v')
+    dload.save('https://covid.ourworldindata.org/data/owid-covid-data.csv','COVID-19.csv')
 except: log('data exists already')
 
 
@@ -35,79 +27,33 @@ args = sys.argv
 
 
 
-#get the newest file in a path
-def newest(path):
-    files = os.listdir(path)
-    paths = [os.path.join(path, basename) for basename in files]
-    return max(paths, key=os.path.getctime)
-
-
-
-
-#open newest daily reort
-dailyrepopath = newest('./COVID-19/csse_covid_19_data/csse_covid_19_daily_reports')
-
-
-
-def gethistoricCountrydata(countryname):
-    with open(dailyrepopath) as csvfile:
-        readcsv = csv.reader(csvfile, delimiter=',')
-        for row in readcsv:
-             if countryname in row[11]:
-                 if len(countryname) == len(row[11]):
-                    return 'Date ','Infected ',row[7]
-
-
-
 #gives value of Country namme
 def getCountrydata(countryname):
-    with open(dailyrepopath) as csvfile:
+    with open('./COVID-19.csv') as csvfile:
         readcsv = csv.reader(csvfile, delimiter=',')
+        data = []
         for row in readcsv:
-             if countryname in row[11]:
-                 if len(countryname) == len(row[11]):
-                    percentage = int(row[8])/int(row[7])
-                    return 'Country ',row[11],'Infected ',row[7],'Dead ',row[8] ,'ratio ',percentage
+            if countryname in row[2]:
+                if len(countryname) == len(row[2]):
+                    d = str(row[2]),str(row[5])
+                    data.append(d)
+    return data[len(data)-1]
 
-
-def getdata(countryname):
-    
-    basepath = './COVID-19/csse_covid_19_data/csse_covid_19_daily_reports/'
-    country = []
-
-    for file in os.listdir('./COVID-19/csse_covid_19_data/csse_covid_19_daily_reports'):
-        if file == 'README.md' or file == '.gitignore':
-            continue
-        else: 
-            with open(basepath+file) as csvfile:
-                readcsv = csv.reader(csvfile, delimiter=',')
-                for row in readcsv:
-                    try:
-                        row[11]
-                        if countryname in row[11]:
-                            if len(countryname) == len(row[11]):
-                                country.append(int(row[11]))
-                    except:
-                        log('Exceptionj')
-    return len(country)
-
-
-
-
-
-def top3():
-    with open(dailyrepopath) as csvfile:
+def gethistoricalCountrydata(countryname):
+    with open('./COVID-19.csv') as csvfile:
         readcsv = csv.reader(csvfile, delimiter=',')
-        i=0
-        countrydata = [['test','test']]
+        date = []
+        newcases = []
         for row in readcsv:
-            if row[8] == 0 or row[8] == 'Deaths':
-                continue
-            else:
-                countrydata.append([[row[8],row[11]]])
-    del countrydata[0]
-    countrydata = sorted(countrydata,key=lambda x: x[0])
-    return countrydata
+            if countryname in row[2]:
+                if len(countryname) == len(row[2]):
+                    d = str(row[2]),str(row[5])
+                    date.append(str(row[3]))
+                    newcases.append(str(row[5]))
+    return newcases
+
+
+
 
 # Dynamic HTML
 
@@ -147,11 +93,11 @@ def dynhtml(country =  []):
     blank_entry_headline = """<tr> <th>{}</th>  <th>{}</th>  <th>{}</th>  <th>{}</th> </tr>"""
     
     data = getCountrydata(country[0])
-    entry = blank_entry_headline.format(data[0],data[2],data[4],data[6])
+    entry = blank_entry_headline.format("Country","New_cases")
     
     for i in range(0,len(country)):
         data = getCountrydata(country[i])
-        entry = entry + blank_entry.format(data[1],data[3],data[5],data[7])
+        entry = entry + blank_entry.format(data[0],data[1])
     page = page.format(datetime.now(),entry)
 
     
@@ -165,25 +111,12 @@ def dynhtml(country =  []):
 
 
 
-#sums up deaths
-def totaldeaths():
-    with open(dailyrepopath) as csvfile:
-        readcsv = csv.reader(csvfile, delimiter=',')
-        country = []
-        total = 0
-        for row in readcsv:
-            country = row[8]
-            try:
-                total = total+int(row[8])
-            except: continue
-        return total
-
 ###########################################
 # end of definition block
 
 for i in range(1,len(args)):
     print(getCountrydata(args[i]))
-
+print(gethistoricalCountrydata("Germany"))
 
 #fuctions need to be worked on
 
@@ -195,5 +128,5 @@ for i in range(1,len(args)):
 countries = sys.argv
 countries[0] = "Germany"
 
-dynhtml(countries)
-print(str(totaldeaths())+' <-- people have died')
+#dynhtml(countries)
+#print(str(totaldeaths())+' <-- people have died')
