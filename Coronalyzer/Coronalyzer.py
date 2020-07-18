@@ -1,190 +1,130 @@
 #!/bin/python
 import time
-import git
 import os
 import csv
 import sys
 from datetime import datetime
+import dload
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-datarepo = "https://github.com/CSSEGISandData/COVID-19"
-#https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports
-
-
-
-#Default Output format
+# Default Output format
 def log(text):
     line = '---->'
-    print(line,text)
+    print(line, text)
 
 
-
-#load data from repo
+# load data from repo
 try:
-    log('trying to clone')
-    git.Git().clone(datarepo)
     log('getting data')
-except: log('data exists already')
+    dload.save('https://covid.ourworldindata.org/data/owid-covid-data.csv', 'COVID-19.csv')
+except:
+    log('data exists already')
 
-
-
-#pass arguments
+# pass arguments
 args = sys.argv
 
 
-
-
-#get the newest file in a path
-def newest(path):
-    files = os.listdir(path)
-    paths = [os.path.join(path, basename) for basename in files]
-    return max(paths, key=os.path.getctime)
-
-
-
-
-#open newest daily reort
-dailyrepopath = newest('./COVID-19/csse_covid_19_data/csse_covid_19_daily_reports')
-
-
-
-
-
-#gives value of Country namme
+# gives value of Country namme
 def getCountrydata(countryname):
-    with open(dailyrepopath) as csvfile:
+    with open('./COVID-19.csv') as csvfile:
         readcsv = csv.reader(csvfile, delimiter=',')
+        data = []
         for row in readcsv:
-             if countryname in row[11]:
-                 if len(countryname) == len(row[11]):
-                    percentage = int(row[8])/int(row[7])
-                    return 'Country ',row[11],'Infected ',row[7],'Dead ',row[8] ,'ratio ',percentage
+            if countryname in row[2]:
+                if len(countryname) == len(row[2]):
+                    d = str(row[2]), str(row[5])
+                    data.append(d)
+    return data[len(data) - 1]
 
 
-def getdata(countryname):
-    
-    basepath = './COVID-19/csse_covid_19_data/csse_covid_19_daily_reports/'
-    country = []
-
-    for file in os.listdir('./COVID-19/csse_covid_19_data/csse_covid_19_daily_reports'):
-        if file == 'README.md' or file == '.gitignore':
-            continue
-        else: 
-            with open(basepath+file) as csvfile:
-                readcsv = csv.reader(csvfile, delimiter=',')
-                for row in readcsv:
-                    try:
-                        row[11]
-                        if countryname in row[11]:
-                            if len(countryname) == len(row[11]):
-                                country.append(int(row[11]))
-                    except:
-                        log('Exceptionj')
-    return len(country)
-
-
-
-
-
-def top3():
-    with open(dailyrepopath) as csvfile:
+def gethistoricalCountrydata(countryname):
+    with open('./COVID-19.csv') as csvfile:
         readcsv = csv.reader(csvfile, delimiter=',')
-        i=0
-        countrydata = [['test','test']]
+        date = []
+        newcases = []
         for row in readcsv:
-            if row[8] == 0 or row[8] == 'Deaths':
-                continue
-            else:
-                countrydata.append([[row[8],row[11]]])
-    del countrydata[0]
-    countrydata = sorted(countrydata,key=lambda x: x[0])
-    return countrydata
+            if str(countryname) in row[2]:
+                toearly = ['2019-12-31', '2020-01-01', '2020-01-02', '2020-01-03', '2020-01-04', '2020-01-05', '2020-01-06', '2020-01-07', '2020-01-08', '2020-01-09', '2020-01-10', '2020-01-11', '2020-01-12', '2020-01-13', '2020-01-14', '2020-01-15', '2020-01-16', '2020-01-17', '2020-01-18', '2020-01-19', '2020-01-20', '2020-01-21', '2020-01-22', '2020-01-23', '2020-01-24', '2020-01-25', '2020-01-26', '2020-01-27', '2020-01-28', '2020-01-29', '2020-01-30', '2020-01-31', '2020-02-01', '2020-02-02', '2020-02-03', '2020-02-04', '2020-02-05', '2020-02-06', '2020-02-07', '2020-02-08', '2020-02-09', '2020-02-10', '2020-02-11', '2020-02-12', '2020-02-13', '2020-02-14', '2020-02-15', '2020-02-16', '2020-02-17', '2020-02-18', '2020-02-19', '2020-02-20', '2020-02-21', '2020-02-22', '2020-02-23', '2020-02-24', '2020-02-25', '2020-02-26', '2020-02-27', '2020-02-28', '2020-02-29', '2020-03-01']
+
+                if len(countryname) == len(row[2]) and row[3] not in toearly :
+                    date.append(str(row[3]))
+
+                    newcases.append(str(row[4]))
+        newcases = [x[:-2] for x in newcases]
+
+    return newcases,date
+
+
+#Graphs and shit
+
+def show(country):
+    data = []
+    for i in range(0, len(country)):
+        data.append(gethistoricalCountrydata(country[i]))
+        colour = ['b','g','r','y']
+        plt.plot(data[i][1],data[i][0], colour[i])
+
+    print(data[0][1])
+
+    plt.ylabel('Cases')
+    plt.xlabel('Date')
+    #plt.savefig('graph.png')
+    plt.show()
+
+
+
+
+
 
 # Dynamic HTML
 
-def dynhtml(country =  []):
-    dynindex = open("/var/www/html/Corona.html","w")
+def dynhtml(country=[]):
+    dynindex = open("/var/www/html/Corona.html", "w")
     page = """
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="/index.css" media="screen" />
-<title>Raspberry Pi</title>
-<link rel="icon" href="https://img.icons8.com/carbon-copy/2x/instagram-new.png">
-</head>
-<body class="background">
-<div class="navbar" width="5000px" background-color=green>
-        <a href="/">Home</a>
-        <a href="/nextcloud">Nextcloud</a>
-        <a href="https://flexonmyex.de:4200">Shell</a>
-        <a href="/access_log.html">Access Log</a>
-</div>
-
-<div>
-<p>Updatet at: {}</p>
-
-<table style="color:white; width:100% ;font-family:Arial ; font-size:200%">
-{}
-</table>
-</div>
-
-    
-
-</body>
 """
-     
+
     blank_entry = """<tr> <th>{}</th>  <th><i>{}</i></th>  <th><i>{}</i></th>  <th><i>{}<i></th> </tr>"""
     blank_entry_headline = """<tr> <th>{}</th>  <th>{}</th>  <th>{}</th>  <th>{}</th> </tr>"""
-    
-    data = getCountrydata(country[0])
-    entry = blank_entry_headline.format(data[0],data[2],data[4],data[6])
-    
-    for i in range(0,len(country)):
-        data = getCountrydata(country[i])
-        entry = entry + blank_entry.format(data[1],data[3],data[5],data[7])
-    page = page.format(datetime.now(),entry)
 
-    
-    
+    data = getCountrydata(country[0])
+    entry = blank_entry_headline.format("Country", "New_cases")
+
+    for i in range(0, len(country)):
+        data = getCountrydata(country[i])
+        entry = entry + blank_entry.format(data[0], data[1])
+    page = page.format(datetime.now(), entry)
+
     dynindex.write(page)
     print("Corona HTML created")
     dynindex.close()
 
 
-
-
-
-
-#sums up deaths
-def totaldeaths():
-    with open(dailyrepopath) as csvfile:
-        readcsv = csv.reader(csvfile, delimiter=',')
-        country = []
-        total = 0
-        for row in readcsv:
-            country = row[8]
-            try:
-                total = total+int(row[8])
-            except: continue
-        return total
-
 ###########################################
 # end of definition block
 
-for i in range(1,len(args)):
+
+countrys = ['Germany','France','Italy']
+show(countrys)
+
+
+for i in range(1, len(args)):
     print(getCountrydata(args[i]))
 
 
-#fuctions need to be worked on
 
-#print(top3())
-#print(getdata('Germany'))
 
-#sum of people who died
+
+# fuctions need to be worked on
+
+# print(top3())
+# print(getdata('Germany'))
+
+# sum of people who died
 
 countries = sys.argv
-countries[0] = "Germany"
 
-dynhtml(countries)
-print(str(totaldeaths())+' <-- people have died')
+
+# dynhtml(countries)
+# print(str(totaldeaths())+' <-- people have died')
