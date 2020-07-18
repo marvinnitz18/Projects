@@ -22,7 +22,7 @@ def log(text):
 #load data from repo
 try:
     log('trying to clone')
-    git.Git().clone(datarepo)
+    git.Git().pull(datarepo)
     log('getting data')
 except: log('data exists already')
 
@@ -47,6 +47,14 @@ def newest(path):
 dailyrepopath = newest('./COVID-19/csse_covid_19_data/csse_covid_19_daily_reports')
 
 
+
+def gethistoricCountrydata(countryname):
+    with open(dailyrepopath) as csvfile:
+        readcsv = csv.reader(csvfile, delimiter=',')
+        for row in readcsv:
+             if countryname in row[11]:
+                 if len(countryname) == len(row[11]):
+                    return 'Date ',,'Infected ',row[7]
 
 
 
