@@ -21,9 +21,9 @@ def log(text):
 
 #load data from repo
 try:
+    log('getting data')
     log('trying to clone')
     git.Git().clone(datarepo)
-    log('getting data')
 except: log('data exists already')
 
 
