@@ -54,7 +54,7 @@ def gethistoricCountrydata(countryname):
         for row in readcsv:
              if countryname in row[11]:
                  if len(countryname) == len(row[11]):
-                    return 'Date ',,'Infected ',row[7]
+                    return 'Date ','Infected ',row[7]
 
 
 
