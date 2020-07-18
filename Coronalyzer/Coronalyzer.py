@@ -1,13 +1,15 @@
 #!/bin/python
 import time
 import git
+from git import RemoteProgress
 import os
 import csv
 import sys
 from datetime import datetime
 
 
-datarepo = "https://github.com/CSSEGISandData/COVID-19"
+repo = ("https://github.com/CSSEGISandData/COVID-19")
+
 #https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports
 
 
@@ -20,12 +22,11 @@ def log(text):
 
 
 #load data from repo
-#try:
-#    log('getting data')
-#    log('trying to clone')
-#    git.Git().clone(datarepo)
-#except: log('data exists already')
-
+try:
+    log('getting data')
+    log('trying to clone')
+    git.Git().clone(repo,'-v')
+except: log('data exists already')
 
 
 #pass arguments
