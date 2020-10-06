@@ -11,6 +11,6 @@
 
 # TODO:
 
-* write more code
-
+* Messaageboard (updaate when messaage is posted, style)
+* Coronalyzer (graphs)
 
