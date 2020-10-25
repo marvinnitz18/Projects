@@ -11,6 +11,6 @@
 
 # TODO:
 
-* Messaageboard (updaate when messaage is posted, style)
+* Messaageboard (multiple messageboads,database (maybe mysql), css)
 * Coronalyzer (graphs)
 
