@@ -1,14 +1,21 @@
 print("Messageboard started")
 from flask import Flask,render_template,request
 from _datetime import datetime
+import os
 
 app = Flask(__name__)
+
+#create folder architecture
+try:
+    os.mkdir("./messages",0o755)
+except: pass
+
 
 
 @app.route("/",methods=["GET","POST"])
 def home():
     try:
-        db = open('messages.txt', 'r')
+        db = open('./messages/messages.txt', 'r')
     except:
         print("no previus messages")
     items = []
@@ -18,7 +25,7 @@ def home():
 
     if request.method == "POST":
         message = request.form["message"]
-        db = open('messages.txt', 'a')
+        db = open('./messages/messages.txt', 'a')
 
         Date = str(datetime.now())[:10]
         Hour = str(datetime.now())[11:13]
