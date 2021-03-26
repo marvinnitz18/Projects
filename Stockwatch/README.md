@@ -4,8 +4,10 @@ place the Stocks you want to watch into the file "stocks.txt" like this:
 FB,GOOGL,
 #
 
+***
 # or if you have only one stock to watch
 #stocks.txt
+***
 
 FB,
 
