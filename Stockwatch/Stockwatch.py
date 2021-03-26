@@ -37,9 +37,33 @@ for i in range(length):
     opening_price = data[count]['open']
     last_price = data[count]['last']
     
-    print(stocks[count]+' opening '+'\033[31m'+str(opening_price)+'\033[0m')
-    print(stocks[count]+' last '+str(last_price))
+    print("\033[1;32;40m"+stocks[count]+'\033[0m'+' opening '+'\033[33m'+str(opening_price)+'\033[0m')
+    print("\033[1;32;40m"+stocks[count]+'\033[0m'+' last '+'\033[33m'+str(last_price)+'\033[0m')
     
+    #calculate percentage
+    try:
+        percentage = last_price / opening_price
+    except:
+        print("No latest data")
+   #stock + 
+    if (percentage > 1 and last_price != "None"):
+        percentage = str(percentage)
+        percentage = percentage[3:]
+        percentage = percentage[:2]
+        percentage = percentage[:1]+','+percentage[1:]
+        print("\033[32m"+"+"+percentage+"\033[0m"+" today")
+    
+    #stock -
+    if (percentage < 1 and last_price != "None"):
+        percentage = str(percentage)
+        percentage = percentage[3:]
+        percentage = percentage[:2]
+        percentage = percentage[:1]+','+percentage[1:]
+        print("\033[31m"+"-"+percentage+"\033[0m"+" today")
+
+    if('percentage' not in locals()):
+        print("percentage could not be calculated")
+        exit()
     
     count = count +1
     print("\n")
