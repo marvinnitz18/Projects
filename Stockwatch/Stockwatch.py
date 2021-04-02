@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 api_key = open("api.key","r")
 access_key = api_key.read()
@@ -36,7 +37,7 @@ count = 0
 for i in range(length):
     opening_price = data[count]['open']
     last_price = data[count]['last']
-    
+    os.system('color 4')
     print("\033[1;32;40m"+stocks[count]+'\033[0m'+' opening '+'\033[33m'+str(opening_price)+'\033[0m')
     print("\033[1;32;40m"+stocks[count]+'\033[0m'+' last '+'\033[33m'+str(last_price)+'\033[0m')
     
