@@ -9,6 +9,7 @@ init()
 
 api_key = open("api.key","r")
 access_key = api_key.read()
+access_key = access_key[:-1]
 #access_key = access_key[:-1]
 
 api_url = "http://api.marketstack.com/v1/intraday/latest"
@@ -26,7 +27,7 @@ print(Fore.GREEN+Back.BLACK+"API REQUEST: "+api_url +"?access_key="+access_key+"
 #API Request
 r = requests.get(api_url +"?access_key="+access_key+"&symbols="+stocks)
 if (r.status_code != 200):
-    print(Fore.RED+Style.RED+"API Request failed !"+Style.RESET_ALL)
+    print(Fore.RED+"API Request failed !"+Style.RESET_ALL)
     exit()
 
 #Stocks into list
