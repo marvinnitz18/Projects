@@ -1,26 +1,32 @@
 import requests
 import json
+import time
 import os
+from colorama import init
+from colorama import Fore, Back, Style
+init()
+
 
 api_key = open("api.key","r")
 access_key = api_key.read()
-access_key = access_key[:-1]
+#access_key = access_key[:-1]
 
 api_url = "http://api.marketstack.com/v1/intraday/latest"
 
 stocks = open("stocks.txt","r")
 stocks = stocks.read()
-print("Stocks to watch: "+stocks)
+print("\n")
+print("Stocks to watch: "+stocks+Style.RESET_ALL)
 
 
 #Initiaziled
 
-print("API REQUEST: "+api_url +"?access_key="+access_key+"&symbols="+stocks)
+print(Fore.GREEN+Back.BLACK+"API REQUEST: "+api_url +"?access_key="+access_key+"&symbols="+stocks+Style.RESET_ALL)
 
 #API Request
 r = requests.get(api_url +"?access_key="+access_key+"&symbols="+stocks)
 if (r.status_code != 200):
-    print("API Request failed !")
+    print(Fore.RED+Style.RED+"API Request failed !"+Style.RESET_ALL)
     exit()
 
 #Stocks into list
@@ -37,36 +43,39 @@ count = 0
 for i in range(length):
     opening_price = data[count]['open']
     last_price = data[count]['last']
-    os.system('color 4')
-    print("\033[1;32;40m"+stocks[count]+'\033[0m'+' opening '+'\033[33m'+str(opening_price)+'\033[0m')
-    print("\033[1;32;40m"+stocks[count]+'\033[0m'+' last '+'\033[33m'+str(last_price)+'\033[0m')
+    
+    print(Fore.BLACK+Back.WHITE+Style.BRIGHT+stocks[count]+Style.RESET_ALL+' opened at '+Style.BRIGHT+str(opening_price)+Style.RESET_ALL)
+    print(stocks[count]+' last '+str(last_price)+Style.RESET_ALL)
     
     #calculate percentage
     try:
         percentage = last_price / opening_price
     except:
-        print("No latest data")
+        print("No latest data available"+Style.RESET_ALL)
+        percentage = None
    #stock + 
-    if (percentage > 1 and last_price != "None"):
+    if (percentage and percentage > 1):
         percentage = str(percentage)
         percentage = percentage[3:]
         percentage = percentage[:2]
         percentage = percentage[:1]+','+percentage[1:]
-        print("\033[32m"+"+"+percentage+"\033[0m"+" today")
-    
-    #stock -
-    if (percentage < 1 and last_price != "None"):
-        percentage = str(percentage)
-        percentage = percentage[3:]
-        percentage = percentage[:2]
-        percentage = percentage[:1]+','+percentage[1:]
-        print("\033[31m"+"-"+percentage+"\033[0m"+" today")
+        print(+Back.GREEN+"+"+percentage+" today"+Style.RESET_ALL)
 
-    if('percentage' not in locals()):
-        print("percentage could not be calculated")
-        exit()
-    
+    #stock -
+    if (percentage and percentage < 1):
+        percentage = str(percentage)
+        percentage = percentage[3:]
+        percentage = percentage[:2]
+        percentage = percentage[:1]+','+percentage[1:]
+        print(+Back.RED+"-"+percentage+" today"+Style.RESET_ALL)
+
+    else:
+        pass
+
+
     count = count +1
     print("\n")
+
+time.sleep(5)
 
 
