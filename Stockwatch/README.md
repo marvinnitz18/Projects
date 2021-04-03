@@ -18,7 +18,7 @@ FB,GOOGL,
 
 
 ***
-## or if you have only one stock to watch
+## or if you have only one stock to watch it needs to have a trailing comma:
 ***
 
 ### stocks.txt example
