@@ -9,7 +9,9 @@ init()
 
 api_key = open("api.key","r")
 access_key = api_key.read()
-access_key = access_key[:-1]
+if "\n" in access_key:
+    access_key = access_key[:-1]
+
 #access_key = access_key[:-1]
 
 api_url = "http://api.marketstack.com/v1/intraday/latest"
