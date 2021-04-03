@@ -32,8 +32,10 @@ FB,
 
 # Your folder architecture should look like this:
 
-```.
+```
+.
 ├── README.md
 ├── api.key
 ├── stocks.txt
-└── Stockwatch.py```
+└── Stockwatch.py
+```
